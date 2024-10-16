@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>(: Analizador de Textos de Elisa :)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f8ff;
+            margin: 20px;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body class="container">
+    <h1 class="my-4">Aplicación de Análisis de Textos</h1>
+    <div class="mb-3">
+        <textarea id="inputText" class="form-control" rows="10" placeholder="Ingrese su texto aquí..."></textarea>
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-primary me-2" onclick="countWords()">Contar Palabras</button>
+        <button class="btn btn-secondary me-2" onclick="listWordRepetitions()">Repeticiones de Palabras</button>
+        <button class="btn btn-info me-2" onclick="searchWords()">Buscar Palabras</button>
+        <input type="text" id="searchQuery" class="form-control d-inline-block w-auto" placeholder="Ingrese palabra a buscar">
+    </div>
+    <div id="result" class="alert alert-light"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function cleanString(text) {
+            return text.replace(/[^\w\u00C0-\u017F\s]/g, '');
+        }
+
+        function wordArray(text) {
+            text = cleanString(text).toLowerCase();
+            return text.split(/\s+/).filter(word => word.length > 0);
+        }
+
+        function countWords() {
+            const inputText = document.getElementById("inputText").value;
+            const words = wordArray(inputText);
+            document.getElementById("result").innerHTML = `Total de palabras: ${words.length}`;
+        }
+
+        function listWordRepetitions() {
+            const inputText = document.getElementById("inputText").value;
+            const words = wordArray(inputText);
+            const wordCount = {};
+
+            words.forEach(word => {
+                if (wordCount[word]) {
+                    wordCount[word]++;
+                } else {
+                    wordCount[word] = 1;
+                }
+            });
+
+            const sortedWords = Object.keys(wordCount).sort();
+            let resultHTML = '<h3>Repeticiones de Palabras:</h3><ul class="list-group">';
+            sortedWords.forEach(word => {
+                resultHTML += `<li class="list-group-item">${word}: ${wordCount[word]}</li>`;
+            });
+            resultHTML += '</ul>';
+            document.getElementById("result").innerHTML = resultHTML;
+        }
+
+        function searchWords() {
+            const inputText = document.getElementById("inputText").value;
+            const searchQuery = document.getElementById("searchQuery").value.toLowerCase();
+            const words = wordArray(inputText);
+            const searchResult = {};
+
+            words.forEach(word => {
+                if (word.includes(searchQuery)) {
+                    if (searchResult[word]) {
+                        searchResult[word]++;
+                    } else {
+                        searchResult[word] = 1;
+                    }
+                }
+            });
+
+            let resultHTML = `<h3>Resultados de búsqueda para: "${searchQuery}"</h3><ul class="list-group">`;
+            for (const [word, count] of Object.entries(searchResult)) {
+                resultHTML += `<li class="list-group-item">${word}: ${count}</li>`;
+            }
+            resultHTML += '</ul>';
+            document.getElementById("result").innerHTML = resultHTML;
+        }
+    </script>
+</body>
+</html>
